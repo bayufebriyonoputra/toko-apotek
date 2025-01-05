@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Filament\Resources\KategoriObatResource;
+namespace App\Filament\Resources\UserResource;
 
-use App\Filament\Resources\KategoriObatResource\Pages;
-use App\Filament\Resources\KategoriObatResource\RelationManagers;
-use App\Models\KategoriObat;
+use App\Filament\Resources\UserResource\Pages;
+use App\Filament\Resources\UserResource\RelationManagers;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,9 +13,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class KategoriObatResource extends Resource
+class UserResource extends Resource
 {
-    protected static ?string $model = KategoriObat::class;
+    protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -23,10 +23,21 @@ class KategoriObatResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
+                Forms\Components\TextInput::make('username')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('keterangan')
+                Forms\Components\TextInput::make('email')
+                    ->email()
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\Textarea::make('alamat')
+                    ->columnSpanFull(),
+                Forms\Components\TextInput::make('phone')
+                    ->tel()
+                    ->maxLength(13),
+                Forms\Components\TextInput::make('role'),
+                Forms\Components\TextInput::make('password')
+                    ->password()
                     ->required()
                     ->maxLength(255),
             ]);
@@ -36,10 +47,16 @@ class KategoriObatResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                Tables\Columns\TextColumn::make('username')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('keterangan')
+                Tables\Columns\TextColumn::make('email')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('email_verified_at')
+                    ->dateTime()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('phone')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('role'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -73,9 +90,9 @@ class KategoriObatResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListKategoriObats::route('/'),
-            'create' => Pages\CreateKategoriObat::route('/create'),
-            'edit' => Pages\EditKategoriObat::route('/{record}/edit'),
+            'index' => Pages\ListUsers::route('/'),
+            'create' => Pages\CreateUser::route('/create'),
+            'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
     }
 }
