@@ -2,22 +2,25 @@
 
 namespace App\Filament\Resources\UserResource;
 
-use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
-use App\Models\User;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
+use App\Models\User;
 use Filament\Tables;
+use App\Enum\RoleEnum;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\UserResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\UserResource\RelationManagers;
+use Illuminate\Database\Eloquent\Model;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'fas-users';
 
     public static function form(Form $form): Form
     {
@@ -95,4 +98,18 @@ class UserResource extends Resource
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
     }
+
+    public static function canCreate(): bool
+    {
+        if (Auth::user()->role == RoleEnum::ADMIN) return true;
+        return false;
+
+    }
+
+   public static function canDelete(Model $record): bool
+   {
+    if (Auth::user()->role == RoleEnum::ADMIN) return true;
+    return false;
+
+   }
 }

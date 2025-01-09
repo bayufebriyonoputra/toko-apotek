@@ -22,7 +22,7 @@ class PengadaanResource extends Resource
 {
     protected static ?string $model = Pengadaan::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'fas-bag-shopping';
 
     public static function form(Form $form): Form
     {

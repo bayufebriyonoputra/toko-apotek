@@ -2,22 +2,25 @@
 
 namespace App\Filament\Resources\ObatResource;
 
-use App\Filament\Resources\ObatResource\Pages;
-use App\Filament\Resources\ObatResource\RelationManagers;
-use App\Models\Obat;
+use App\Enum\RoleEnum;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
+use App\Models\Obat;
 use Filament\Tables;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\ObatResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\ObatResource\RelationManagers;
+use Illuminate\Database\Eloquent\Model;
 
 class ObatResource extends Resource
 {
     protected static ?string $model = Obat::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'fas-pills';
 
     public static function form(Form $form): Form
     {
@@ -119,5 +122,18 @@ class ObatResource extends Resource
             'create' => Pages\CreateObat::route('/create'),
             'edit' => Pages\EditObat::route('/{record}/edit'),
         ];
+    }
+
+    public static function canCreate(): bool
+    {
+        if (Auth::user()->role == RoleEnum::ADMIN) return true;
+        return false;
+
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        if (Auth::user()->role == RoleEnum::ADMIN) return true;
+        return false;
     }
 }
