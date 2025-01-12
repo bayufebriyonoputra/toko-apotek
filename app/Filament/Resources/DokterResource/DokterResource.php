@@ -2,20 +2,21 @@
 
 namespace App\Filament\Resources\DokterResource;
 
-use App\Filament\Resources\DokterResource\Pages;
-use App\Filament\Resources\DokterResource\RelationManagers;
-use App\Models\Dokter;
 use Filament\Forms;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Columns\TextColumn;
+use App\Models\Dokter;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Filament\Forms\Components\Textarea;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\DokterResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use App\Filament\Resources\DokterResource\RelationManagers;
 
 class DokterResource extends Resource
 {
@@ -48,6 +49,10 @@ class DokterResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->headerActions([
+                ExportAction::make()->label('Download Report')
+                ->icon('fas-download'),
+            ])
             ->columns([
                 TextColumn::make('nama_dokter')
                     ->label('Nama Dokter')

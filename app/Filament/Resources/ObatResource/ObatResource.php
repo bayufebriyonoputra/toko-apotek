@@ -15,6 +15,7 @@ use App\Filament\Resources\ObatResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ObatResource\RelationManagers;
 use Illuminate\Database\Eloquent\Model;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class ObatResource extends Resource
@@ -63,6 +64,10 @@ class ObatResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->headerActions([
+                ExportAction::make()->label('Download Report')
+                ->icon('fas-download'),
+            ])
             ->columns([
                 Tables\Columns\TextColumn::make('kategoriObat.name')
                     ->numeric()

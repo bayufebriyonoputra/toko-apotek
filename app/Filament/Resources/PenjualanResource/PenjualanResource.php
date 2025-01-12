@@ -18,8 +18,9 @@ use Filament\Forms\Components\Repeater;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\PenjualanResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\PenjualanResource\RelationManagers;
+use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use App\Filament\Resources\PenjualanResource\RelationManagers;
 
 class PenjualanResource extends Resource
 {
@@ -106,6 +107,10 @@ class PenjualanResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->headerActions([
+                ExportAction::make()->label('Download Report')
+                ->icon('fas-download'),
+            ])
             ->columns([
                 Tables\Columns\TextColumn::make('user_id')
                     ->numeric()
