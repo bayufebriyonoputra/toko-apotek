@@ -27,6 +27,7 @@ class PenjualanResource extends Resource
     protected static ?string $model = Penjualan::class;
 
     protected static ?string $navigationIcon = 'fas-cart-flatbed';
+    protected static ?string $navigationLabel = 'Penjualan';
 
     public static function form(Form $form): Form
     {

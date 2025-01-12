@@ -25,6 +25,7 @@ class PengadaanResource extends Resource
     protected static ?string $model = Pengadaan::class;
 
     protected static ?string $navigationIcon = 'fas-bag-shopping';
+    protected static ?string $navigationLabel = 'Pengadaan';
 
     public static function form(Form $form): Form
     {

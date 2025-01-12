@@ -20,14 +20,14 @@
 </head>
 
 <body>
-    <p style="text-align: center;">Toko Apotek<br>Jl. Anywhere<br>Everywhere</p>
+    <p style="text-align: center;">Apotek Orange Bligo<br>Bligo, Kec Candi<br>Sidoarjo</p>
     <p style="text-align: center;">
         =======================================================================================================================================================================================================
     </p>
     <table style="width: 100%; border-collapse: collapse; border: none rgb(0, 0, 0);">
         <tbody>
             <tr>
-                <td style="width: 50%; border: none rgb(0, 0, 0); font-size: 13px;">{{ $data->no_nota }}</td>
+                <td style="width: 50%; border: none rgb(0, 0, 0); font-size: 13px;">No Nota : {{ $data->no_nota }}</td>
                 <td style="width: 50%; border: none rgb(0, 0, 0); font-size: 13px; text-align: right;">
                     {{ carbon\Carbon::parse($data->created_at)->isoFormat('D MMM YYYY') }}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 </td>

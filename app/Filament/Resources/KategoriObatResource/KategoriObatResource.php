@@ -18,6 +18,7 @@ class KategoriObatResource extends Resource
     protected static ?string $model = KategoriObat::class;
 
     protected static ?string $navigationIcon = 'fas-table-list';
+    protected static ?string $navigationLabel = 'Kategori Obat';
 
     public static function form(Form $form): Form
     {
