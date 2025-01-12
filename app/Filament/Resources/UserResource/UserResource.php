@@ -38,7 +38,15 @@ class UserResource extends Resource
                 Forms\Components\TextInput::make('phone')
                     ->tel()
                     ->maxLength(13),
-                Forms\Components\TextInput::make('role'),
+                Forms\Components\Select::make('role')
+                    ->options(function(){
+                        $array = RoleEnum::toArray();
+                        $isi = [];
+                        foreach($array as $a){
+                            $isi[$a['values']] = $a['label'];
+                        }
+                        return $isi;
+                    }),
                 Forms\Components\TextInput::make('password')
                     ->password()
                     ->required()
