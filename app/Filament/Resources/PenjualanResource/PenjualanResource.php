@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use App\Filament\Resources\PenjualanResource\RelationManagers;
+use Filament\Notifications\Notification;
 
 class PenjualanResource extends Resource
 {
@@ -34,74 +35,86 @@ class PenjualanResource extends Resource
         return $form
             ->schema([
                 Section::make('Informasi Utama')
-                ->description('Isi terleih dahulu bagian berikut ini')
-                ->schema([
-                    Forms\Components\Select::make('dokter_id')
-                        ->relationship(name: 'dokter', titleAttribute: 'nama_dokter')
-                        ->native(false)
-                        ->preload(),
-                    Forms\Components\TextInput::make('no_nota')
-                        ->required()
-                        ->maxLength(255),
-                    Forms\Components\DatePicker::make('tanggal')
-                        ->required(),
-                ])->columns(2),
+                    ->description('Isi terleih dahulu bagian berikut ini')
+                    ->schema([
+                        Forms\Components\Select::make('dokter_id')
+                            ->relationship(name: 'dokter', titleAttribute: 'nama_dokter')
+                            ->native(false)
+                            ->preload(),
+                        Forms\Components\TextInput::make('no_nota')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\DatePicker::make('tanggal')
+                            ->required(),
+                    ])->columns(2),
 
-            Section::make('Detail Obat')
-                ->description('Isikan detail obat yang ada disini')
-                ->schema([
-                    Repeater::make('details')
-                        ->relationship(name: 'details')
-                        ->schema([
-                            Forms\Components\Select::make('obat_id')
-                                ->options(Obat::all()->pluck('nama_obat', 'id'))
-                                ->label('Pilih Obat')
-                                ->preload()
-                                ->native(false)
-                                ->searchable()
-                                ->live()
-                                ->afterStateUpdated(function (Get $get, Set $set) {
-                                    $obat = Obat::find($get('obat_id'));
-                                    $set('harga', $obat->harga_jual);
-                                }),
-                            Forms\Components\TextInput::make('satuan')
-                                ->required(),
-                            Forms\Components\TextInput::make('harga')
-                                ->numeric()
-                                ->readOnly()
-                                ->prefix("Rp.")
-                                ->required(),
-                            Forms\Components\TextInput::make('jumlah')
-                                ->numeric()
-                                ->required()
-                                ->live()
-                                ->afterStateUpdated(function (Get $get, Set $set) {
-                                    $set('subtotal', $get('jumlah') * $get('harga'));
-                                }),
-                            Forms\Components\TextInput::make('subtotal')
-                                ->numeric()
-                                ->readOnly()
-                                ->prefix("Rp.")
-                                ->required(),
+                Section::make('Detail Obat')
+                    ->description('Isikan detail obat yang ada disini')
+                    ->schema([
+                        Repeater::make('details')
+                            ->relationship(name: 'details')
+                            ->schema([
+                                Forms\Components\Select::make('obat_id')
+                                    ->options(Obat::all()->pluck('nama_obat', 'id'))
+                                    ->label('Pilih Obat')
+                                    ->preload()
+                                    ->native(false)
+                                    ->searchable()
+                                    ->live()
+                                    ->afterStateUpdated(function (Get $get, Set $set) {
+                                        $obat = Obat::find($get('obat_id'));
+                                        $set('harga', $obat->harga_jual);
+                                    }),
+                                Forms\Components\TextInput::make('satuan')
+                                    ->required(),
+                                Forms\Components\TextInput::make('harga')
+                                    ->numeric()
+                                    ->readOnly()
+                                    ->prefix("Rp.")
+                                    ->required(),
+                                Forms\Components\TextInput::make('jumlah')
+                                    ->numeric()
+                                    ->required()
+                                    ->live()
+                                    ->afterStateUpdated(function (Get $get, Set $set, $state) {
+                                        $obat = Obat::find($get('obat_id'));
+                                        if ($obat) {
+                                            //cek stok
+                                            if ($state > $obat->stok_obat) {
+                                                $set('jumlah', null);
+                                                Notification::make()
+                                                    ->title('Stok Obat Tidak Cukup')
+                                                    ->danger()
+                                                    ->send();
+                                            } else {
+                                                $set('subtotal', $state * $get('harga'));
+                                            }
+                                        }
+                                    }),
+                                Forms\Components\TextInput::make('subtotal')
+                                    ->numeric()
+                                    ->readOnly()
+                                    ->prefix("Rp.")
+                                    ->required(),
 
-                        ])->columns(2)
-                        ->live()
-                        ->afterStateUpdated(function (Get $get, Set $set) {
-                            self::updateRepeater($get, $set);
-                        })
-                ]),
+                            ])->columns(2)
+                            ->live()
+                            ->afterStateUpdated(function (Get $get, Set $set) {
+                                self::updateRepeater($get, $set);
+                            })
+                    ]),
 
-            Section::make('Lain Lain')
-                ->schema([
-                    Forms\Components\TextInput::make('total')
-                        ->readOnly()
-                        ->prefix('Rp.')
-                        ->required()
-                        ->numeric(),
-                    Forms\Components\Textarea::make('keterangan')
-                        ->required()
-                        ->columnSpanFull(),
-                ]),
+                Section::make('Lain Lain')
+                    ->schema([
+                        Forms\Components\TextInput::make('total')
+                            ->readOnly()
+                            ->prefix('Rp.')
+                            ->required()
+                            ->numeric(),
+                        Forms\Components\Textarea::make('keterangan')
+                            ->required()
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 
@@ -110,7 +123,7 @@ class PenjualanResource extends Resource
         return $table
             ->headerActions([
                 ExportAction::make()->label('Download Report')
-                ->icon('fas-download'),
+                    ->icon('fas-download'),
             ])
             ->columns([
                 Tables\Columns\TextColumn::make('user_id')
@@ -141,11 +154,11 @@ class PenjualanResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\Action::make('pdf') 
+                Tables\Actions\Action::make('pdf')
                     ->label('Nota')
                     ->color('success')
                     ->icon('heroicon-o-arrow-down-tray')
-                    ->url(fn (Penjualan $record) => route('pdf', $record))
+                    ->url(fn(Penjualan $record) => route('pdf', $record))
                     ->openUrlInNewTab(),
             ])
             ->bulkActions([

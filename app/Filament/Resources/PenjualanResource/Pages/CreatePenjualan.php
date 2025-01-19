@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Filament\Resources\Pages\CreateRecord;
 use App\Filament\Resources\PenjualanResource\PenjualanResource;
 use App\Models\Dokter;
+use App\Models\Obat;
 use App\Models\Penjualan;
 
 class CreatePenjualan extends CreateRecord
@@ -32,5 +33,18 @@ class CreatePenjualan extends CreateRecord
             $dokter->save();
         }
         return static::getModel()::create($data);
+    }
+
+    protected function afterCreate(): void
+    {
+        $details = $this->data['details'] ?? [];
+        foreach ($details as $detail) {
+            $obat = Obat::find($detail['obat_id']);
+
+            if ($obat) {
+                $obat->stok_obat -= $detail['jumlah'];
+                $obat->save();
+            }
+        }
     }
 }
